@@ -6,6 +6,7 @@
   "author": "evan",
   "license": "MIT",
   "scripts": {
+    "dev": "electron .",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
