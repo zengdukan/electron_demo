@@ -1,8 +1,10 @@
 // main.js
 
 // 控制应用生命周期和创建原生浏览器窗口的模组
-const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron')
+const { app, BrowserWindow, ipcMain, nativeTheme, Tray, nativeImage, Menu } = require('electron')
 const path = require('path')
+
+let tray = null; // 必须全局, 在局部定义会消失
 
 function initIpcMain() {
     ipcMain.handle('dark-mode:toggle', () => {
@@ -50,6 +52,19 @@ app.whenReady().then(() => {
     // 打开的窗口，那么程序会重新创建一个窗口。
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  const icon = nativeImage.createFromPath(path.join(__dirname, '16.png'));
+  tray = new Tray(icon);
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Item1', type: 'radio' },
+    { label: 'Item2', type: 'radio' },
+    { label: 'Item3', type: 'radio', checked: true },
+    { label: 'Item4', type: 'radio' }
+  ])
+  
+  tray.setContextMenu(contextMenu)
+  tray.setToolTip('This is my application')
+  tray.setTitle('This is my title')
 })
 
 // 除了 macOS 外，当所有窗口都被关闭的时候退出程序。 因此，通常对程序和它们在
