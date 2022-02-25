@@ -18,6 +18,16 @@ function initIpcMain() {
     ipcMain.handle('dark-mode:system', () => {
         nativeTheme.themeSource = 'system';
     });
+
+    ipcMain.on('asynchronous-message', (event, arg) => {
+      console.log(arg);
+      event.reply('asynchronous-reply', 'pong');
+    });
+
+    ipcMain.on('synchronous-message', (event, arg) => {
+      console.log(arg);
+      event.returnValue = 'pong';
+    });
 }
 
 function createWindow () {
@@ -30,6 +40,7 @@ function createWindow () {
     }
   })
 
+  mainWindow.webContents.openDevTools();
   // 加载 index.html
   mainWindow.loadFile('index.html')
 
@@ -38,16 +49,12 @@ function createWindow () {
 
   initIpcMain();
 
-  const menu = new Menu();
-  menu.append(new MenuItem({
-    label: 'Electron',
-    submenu: [{
-        role: 'help',
-        accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'Alt+Shift+I',
-        click: () => { console.log('Electron rocks!'); }
-    }]
-  }));
-  Menu.setApplicationMenu(menu);
+  // change default menu's click
+  const menu = Menu.getApplicationMenu();
+  const menuItem = menu.items[menu.items.length - 1];
+  menuItem.submenu.items[0].click = () => {
+    mainWindow.webContents.send('ping', {id: 'whooooooh!'});
+  }
 }
 
 // 这段程序将会在 Electron 结束初始化
